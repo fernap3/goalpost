@@ -1,6 +1,11 @@
 :root {
-	font-family: Roboto, sans-serif;
+	font-family: -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
 	--color-paper: white;
+	--color-table: #ff5383;
+}
+
+body {
+	background: var(--color-table);
 }
 
 .accounts-list {
@@ -11,7 +16,8 @@
 
 .card {
 	background: var(--color-paper);
-	box-shadow: 0 0 5px 0 rgba(0, 0, 0, .1);
+	box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, .15);
+	border-radius: 4px;
 }
 
 .account {
