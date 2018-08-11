@@ -1,3 +1,22 @@
 :root {
 	font-family: Roboto, sans-serif;
+	--color-paper: white;
+}
+
+.accounts-list {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+}
+
+.card {
+	background: var(--color-paper);
+	box-shadow: 0 0 5px 0 rgba(0, 0, 0, .1);
+}
+
+.account {
+	margin-bottom: 20px;
+	padding: 1em;
+	width: 100%;
+	max-width: 450px;
 }
