@@ -2,6 +2,9 @@
 	font-family: -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
 	--color-paper: white;
 	--color-table: #ff5383;
+	--color-status-ok: rgb(0, 150, 0);
+	--color-status-warning: rgb(255, 155, 0);
+	--color-status-danger: rgb(224, 0, 0);
 }
 
 body {
@@ -12,17 +15,11 @@ body {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: center;
+	align-items: flex-start;
 }
 
 .card {
 	background: var(--color-paper);
 	box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, .15);
 	border-radius: 4px;
-}
-
-.account {
-	margin-bottom: 20px;
-	padding: 1em;
-	width: 100%;
-	max-width: 450px;
 }

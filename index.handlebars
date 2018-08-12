@@ -12,6 +12,8 @@
   <div class="accounts-list"></div>
 
   <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
+  <script src="/node_modules/moment/min/moment.min.js"></script>
+  <script src="/account-card.js"></script>
   <script>
 
 	async function onPageLoad()
@@ -35,7 +37,7 @@
 			handler.open();
 		});*/
 
-		const res = await fetch("/accounts", {
+		const res = await fetch("/transactions", {
 			method: "GET"
 		});
 
@@ -44,11 +46,27 @@
 
 		for (let account of resData.accounts)
 		{
-			const accountInfoBox = document.createElement("div");
-			accountInfoBox.className = "card account";
-			accountInfoBox.innerHTML = `<strong>${account.name} $${account.balances.available != null ? account.balances.available : account.balances.current}</strong><br>${account.subtype} ${account.mask}`;
-			accountsList.appendChild(accountInfoBox);
+			// Get all transactions for this account that happened since the beginning of this week
+			const transactions = resData.transactions.filter(t => 
+			(
+				t.account_id === account.account_id &&
+				moment(t.date).diff(moment(beginningOfWeek()), "days") >= 0
+			));
+
+			const card = new AccountCardElement(account, transactions);
+			accountsList.appendChild(card);
 		}
+	}
+
+	function beginningOfWeek()
+	{
+		const prevMonday = new Date();
+		prevMonday.setDate(prevMonday.getDate() - (prevMonday.getDay() + 6) % 7);
+		prevMonday.setHours(0);
+		prevMonday.setMinutes(0);
+		prevMonday.setSeconds(0);
+		prevMonday.setMilliseconds(0);
+		return prevMonday;
 	}
   </script>
 </body>
