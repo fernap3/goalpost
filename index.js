@@ -7,6 +7,7 @@ var plaid = require('plaid');
 const expressHandlebars = require("express-handlebars");
 const path = require("path");
 const moment = require("moment");
+const session = require("express-session");
 
 dotenv.config();
 
@@ -27,12 +28,22 @@ var client = new plaid.Client(
 var app = express();
 app.use(express.static('.'));
 
+app.use(session({
+	//store: new RedisStore(redisOptions),
+	secret: process.env.SESSION_COOKIE_SECRET,
+	proxy: app.settings.env === "production",
+	resave: false,
+	saveUninitialized: false,
+	rolling: true,
+	cookie: { secure: app.settings.env === "production", maxAge: 2628000000 }
+}));
+
 app.use(bodyParser.urlencoded({
 	extended: false
 }));
 app.use(bodyParser.json());
 
-app.get('/', async (req, res, next) => {
+app.get('/', requireLogin, async (req, res, next) => {
 	const expressHandlebars = require("express-handlebars");
 	const handlebars = expressHandlebars.create();
 
@@ -44,13 +55,34 @@ app.get('/', async (req, res, next) => {
 	res.send(html);
 });
 
-app.post('/get_access_token', function (request, response, next) {
-	PUBLIC_TOKEN = request.body.public_token;
+app.get("/", async (req, res, next) => {
+	const expressHandlebars = require("express-handlebars");
+	const handlebars = expressHandlebars.create();
+
+	const html = await handlebars.render(path.join(__dirname, "login.handlebars"), {
+	});
+
+	res.send(html);
+});
+
+app.post('/login', function (req, res, next) {
+	console.log(req.body.email, req.body.password);
+
+	if (req.body.email === process.env.USER_EMAIL && req.body.password === process.env.USER_PASSWORD)
+	{
+		req.session.userId = process.env.USER_EMAIL;
+	}
+
+	res.redirect("/");
+});
+
+app.post('/get_access_token', function (req, res, next) {
+	PUBLIC_TOKEN = req.body.public_token;
 	client.exchangePublicToken(PUBLIC_TOKEN, function (error, tokenResponse) {
 		if (error != null) {
 			var msg = 'Could not exchange public_token!';
 			console.log(msg + '\n' + JSON.stringify(error));
-			return response.json({
+			return res.json({
 				error: msg
 			});
 		}
@@ -58,26 +90,26 @@ app.post('/get_access_token', function (request, response, next) {
 		ITEM_ID = tokenResponse.item_id;
 		console.log('Access Token: ' + ACCESS_TOKEN);
 		console.log('Item ID: ' + ITEM_ID);
-		response.json({
+		res.json({
 			'error': false
 		});
 	});
 });
 
-app.get('/accounts', function (request, response, next) {
+app.get('/accounts', function (req, res, next) {
 	// Retrieve high-level account information and account and routing numbers
 	// for each account associated with the Item.
 	client.getAuth(ACCESS_TOKEN, function (error, authResponse) {
 		if (error != null) {
 			var msg = 'Unable to pull accounts from the Plaid API.';
 			console.log(msg + '\n' + JSON.stringify(error));
-			return response.json({
+			return res.json({
 				error: msg
 			});
 		}
 
 		console.log(authResponse.accounts);
-		response.json({
+		res.json({
 			error: false,
 			accounts: authResponse.accounts,
 			numbers: authResponse.numbers,
@@ -136,3 +168,15 @@ app.get('/transactions', function (req, res, next) {
 var server = app.listen(process.env.PORT || 5000, function () {
 	console.log('goalpost server listening on port ' + process.env.PORT || 5000);
 });
+
+/** Middleware to redirect the user to the home page if they are not logged in */
+function requireLogin(req, res, next)
+{
+	if (!req.session.userId)
+	{
+		res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+		next("route");
+	}
+	else
+		next();
+}
