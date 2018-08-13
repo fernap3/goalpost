@@ -1,6 +1,6 @@
 {
-    "name": "Spendsprint, a weekly spending tracker",
-    "short_name": "Spendsprint",
+    "name": "SpendSprint, a weekly spending tracker",
+    "short_name": "SpendSprint",
     "icons": [
         {
             "src": "app-icon-192.png",
