@@ -51,8 +51,8 @@ class AccountCardElement extends HTMLElement
 				<div class="account__header__balance">$${account.balances.available != null ? account.balances.available : account.balances.current}</div>
 			</div>
 			<div class="account__body" style="display:none">
-				<p>Spent this week:</p>
-				<p><span class="account__spent" style="color:${color}">$${(Math.round(totalSpentThisWeek * 100) / 100).toLocaleString()}</span> / $${weeklyBudget}</p>
+				<p class="account__body__spendingtitle">Spent this week:</p>
+				<p class="account__body_spending"><span class="account__spent" style="color:${color}">$${(Math.round(totalSpentThisWeek * 100) / 100).toLocaleString()}</span> / $${weeklyBudget}</p>
 				<div class="account__body__histogram">
 					${summedSpendingByDay.map(s => `<div class="account__body__histogram__bar" style="height:${(s/maxSpendingInOneDay)*100}%;background:${s > weeklyBudget/7 ? "var(--color-status-danger)" : s / (weeklyBudget/7) > .8 ? "var(--color-status-warning)" : "var(--color-status-ok)" }"></div>`).join("")}
 					<div class="account__body__histogram__daylabel">Mon</div>
@@ -121,6 +121,7 @@ class AccountCardElement extends HTMLElement
 				grid-template-rows: 100px;
 				grid-column-gap: 10px;
 				position: relative;
+				margin-top: 2.6em;
 			}
 
 			.account__body__histogram__bar {
@@ -140,6 +141,16 @@ class AccountCardElement extends HTMLElement
 				top: 0;
 				left: 0;
 				border-bottom: 2px dashed #222222;
+			}
+
+			.account__body__spendingtitle {
+				text-align: center;
+				margin-bottom: .2em;
+			}
+
+			.account__body_spending {
+				text-align: center;
+				margin-top: .2em;
 			}
 		`;
 		this.shadowRoot.appendChild(style);

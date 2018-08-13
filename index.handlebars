@@ -9,12 +9,15 @@
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
 <body onload="onPageLoad()">
+  <div class="scroll-loader" style="display: none">loading...</div>
   <div class="accounts-list"></div>
-
+  <div class="last-updated" style="display: none"></div>
   <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
   <script src="/node_modules/moment/min/moment.min.js"></script>
   <script src="/account-card.js"></script>
   <script>
+	let lastUpdated;
+	let lastUpdatedDisplay;
 
 	async function onPageLoad()
 	{
@@ -37,12 +40,58 @@
 			handler.open();
 		});*/
 
+		refreshPage();
+
+		let overscrolled = false;
+		const loader = document.querySelector(".scroll-loader");
+
+		window.onscroll = evt => {
+			console.log(window.scrollY);
+
+			if (window.scrollY < -60)
+			{
+				overscrolled = true;
+				loader.style.display = "";
+			}
+			if (window.scrollY >= -60 && overscrolled)
+			{
+				overscrolled = false;
+				refreshPage();
+				loader.style.display = "none";
+			}
+		};
+
+		lastUpdatedDisplay = document.querySelector(".last-updated");
+
+		setInterval(() => updateLastUpdatedDisplay(), 5000);
+	}
+
+	function updateLastUpdatedDisplay()
+	{
+		if (!lastUpdated)
+			return;
+
+		lastUpdatedDisplay.style.display = "";
+
+		const now = new Date();
+		const ms = now.getTime() - lastUpdated.getTime();
+		const minutes = Math.round(ms / 1000 / 60);
+		if (ms < 60000)
+			lastUpdatedDisplay.innerHTML = `Updated just now`;
+		else
+			lastUpdatedDisplay.innerHTML = `Updated ${minutes} ${minutes >  1 ? "minutes" : "minute"} ago`;
+	}
+
+	async function refreshPage()
+	{
 		const res = await fetch("/transactions", {
 			method: "GET"
 		});
 
 		const resData = await res.json();
 		const accountsList = document.querySelector(".accounts-list");
+
+		accountsList.innerHTML = "";
 
 		for (let account of resData.accounts)
 		{
@@ -56,6 +105,9 @@
 			const card = new AccountCardElement(account, transactions);
 			accountsList.appendChild(card);
 		}
+
+		lastUpdated = new Date();
+		updateLastUpdatedDisplay();
 	}
 
 	function beginningOfWeek()
