@@ -89,6 +89,8 @@ class AccountCardElement extends HTMLElement
 				max-width: 450px;
 				box-sizing: border-box;
 				font-size: 18px;
+				overflow: hidden;
+				transition: height .6s cubic-bezier(0.165, 0.84, 0.44, 1);
 			}
 
 			.account__spent {
@@ -169,8 +171,19 @@ class AccountCardElement extends HTMLElement
 
 	openCard()
 	{
+		const header = this.shadowRoot.querySelector(".account__header");
 		const body = this.shadowRoot.querySelector(".account__body");
 		body.style.display = "";
+
+		this.style.height = `${header.offsetHeight}px`;
+
+		requestAnimationFrame(() => {
+			this.style.height = `${header.offsetHeight + body.offsetHeight}px`;
+
+			requestAnimationFrame(() => {
+				new AnimatedScroller().ScrollToElement(document.body, header);
+			});
+		});
 
 		this.setAttribute("open", "");
 		
@@ -179,8 +192,19 @@ class AccountCardElement extends HTMLElement
 
 	closeCard()
 	{
+		const header = this.shadowRoot.querySelector(".account__header");
 		const body = this.shadowRoot.querySelector(".account__body");
-		body.style.display = "none";
+		body.style.display = "";
+
+		this.style.height = `${header.offsetHeight + body.offsetHeight}px`;
+
+		requestAnimationFrame(() => {
+			this.style.height = `${header.offsetHeight}px`;
+
+			requestAnimationFrame(() => {
+				new AnimatedScroller().ScrollToElement(document.body, header);
+			});
+		});
 
 		this.removeAttribute("open");
 		
