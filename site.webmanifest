@@ -1,6 +1,6 @@
 {
-    "name": "Goalpost Spending Buddy",
-    "short_name": "Goalpost",
+    "name": "Spendsprint, a weekly spending tracker",
+    "short_name": "Spendsprint",
     "icons": [
         {
             "src": "app-icon-192.png",
