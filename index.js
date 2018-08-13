@@ -55,6 +55,7 @@ app.get('/', requireLogin, async (req, res, next) => {
 	res.send(html);
 });
 
+// Public page with login inputs
 app.get("/", async (req, res, next) => {
 	const expressHandlebars = require("express-handlebars");
 	const handlebars = expressHandlebars.create();
@@ -76,7 +77,8 @@ app.post('/login', function (req, res, next) {
 	res.redirect("/");
 });
 
-app.post('/get_access_token', function (req, res, next) {
+
+app.post('/get_access_token', requireLogin, function (req, res, next) {
 	PUBLIC_TOKEN = req.body.public_token;
 	client.exchangePublicToken(PUBLIC_TOKEN, function (error, tokenResponse) {
 		if (error != null) {
@@ -96,7 +98,7 @@ app.post('/get_access_token', function (req, res, next) {
 	});
 });
 
-app.get('/accounts', function (req, res, next) {
+app.get('/accounts', requireLogin, function (req, res, next) {
 	// Retrieve high-level account information and account and routing numbers
 	// for each account associated with the Item.
 	client.getAuth(ACCESS_TOKEN, function (error, authResponse) {
@@ -117,7 +119,7 @@ app.get('/accounts', function (req, res, next) {
 	});
 });
 
-app.post('/item', function (request, response, next) {
+app.post('/item', requireLogin, function (request, response, next) {
 	// Pull the Item - this includes information about available products,
 	// billed products, webhook information, and more.
 	client.getItem(ACCESS_TOKEN, function (error, itemResponse) {
@@ -146,7 +148,7 @@ app.post('/item', function (request, response, next) {
 	});
 });
 
-app.get('/transactions', function (req, res, next) {
+app.get('/transactions', requireLogin, function (req, res, next) {
 	// Pull transactions for the Item for the last 30 days
 	var startDate = moment().subtract(30, 'days').format('YYYY-MM-DD');
 	var endDate = moment().format('YYYY-MM-DD');

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Current Sprint | Goalpost</title>
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<link rel="manifest" href="/site.webmanifest">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
+<body onload="onPageLoad()">
+  <form action="/login" method="POST">
+	<label class="login-label">Email</label>
+	<input type="email" class="login-input" name="email">
+	<label class="login-label">Password</label>
+	<input type="password" class="login-input" name="password">
+	<button type="submit" class="login-submit">Log In</button>
+  </form>
+  <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
+  <script src="/node_modules/moment/min/moment.min.js"></script>
+  <script src="/account-card.js"></script>
+  <script src="/animated-scroller.js"></script>
+  <script>
+	async function onPageLoad()
+	{
+
+	}
+  </script>
+</body>
+</html>
