@@ -43,6 +43,17 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
+if (app.settings.env === "production")
+	{
+		// Redirect http to https in production only
+		app.use((req, res, next) => {
+			if (req.header("x-forwarded-proto") !== "https")
+				res.redirect(`https://${req.header("host")}${req.url}`);
+			else
+				next();
+		});
+	}
+
 app.get('/', requireLogin, async (req, res, next) => {
 	const expressHandlebars = require("express-handlebars");
 	const handlebars = expressHandlebars.create();
